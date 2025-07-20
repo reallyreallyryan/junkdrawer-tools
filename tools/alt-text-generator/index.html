@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alt Text Generator - JunkDrawer.Tools</title>
+    <meta name="description" content="Generate SEO-friendly alt text for images using AI. Upload multiple images and get AI-powered descriptions for better accessibility and SEO.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .tool-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .form-group input[type="password"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .file-upload-area {
+            border: 2px dashed #e5e7eb;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-yellow);
+            background: #fffbf0;
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-yellow);
+            background: #fffbf0;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #f1c40f;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--charcoal-gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #495057;
+        }
+
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .image-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .image-filename {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .alt-text-result {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            border: 1px solid #e5e7eb;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alt-text-result.loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .alt-text-result.success {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+            color: #0c4a6e;
+        }
+
+        .alt-text-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+
+        .processing-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid var(--primary-yellow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #feb2b2;
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--charcoal-gray);
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .image-preview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1>Alt Text Generator</h1>
+            <p>Generate SEO-friendly alt text for images using AI. Upload multiple images and get AI-powered descriptions for better accessibility and SEO.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>🖼️ How it works</h3>
+            <ul>
+                <li>Upload one or multiple images (JPG, PNG, GIF, WebP)</li>
+                <li>Add your OpenAI API key for AI-powered descriptions</li>
+                <li>Get SEO-optimized alt text for each image</li>
+                <li>Copy and paste the results into your website</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <div class="form-group">
+                <label for="apiKey">OpenAI API Key (required)</label>
+                <input type="password" id="apiKey" name="apiKey" 
+                       placeholder="sk-..." required>
+                <small style="color: #666; font-size: 0.875rem;">
+                    Your API key is only used for this session and never stored.
+                    <a href="/blog/how-to-get-openai-api-key/" target="_blank">Need an API key?</a>
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Images</label>
+                <div class="file-upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Drop images here or click to browse</div>
+                    <div class="upload-subtext">Supports JPG, PNG, GIF, WebP (max 10MB each)</div>
+                </div>
+                <input type="file" id="fileInput" class="file-input" 
+                       accept="image/*" multiple>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="button" class="btn" id="generateBtn" disabled>
+                    🪄 Generate Alt Text
+                </button>
+                <button type="button" class="btn btn-secondary" id="clearBtn" style="margin-left: 1rem;">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="processing-section" id="processingSection">
+            <div class="spinner"></div>
+            <p>Generating alt text for your images...</p>
+        </div>
+
+        <div id="imagePreview" class="image-preview"></div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools - Built with caffeine and questionable decisions</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
