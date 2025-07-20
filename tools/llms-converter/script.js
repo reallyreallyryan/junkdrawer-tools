@@ -1,5 +1,5 @@
 // Frontend JavaScript for LLMS.txt Converter
-// This is a demo implementation - in production you'd connect to a backend API
+// Real API implementation connecting to FastAPI backend
 
 class LLMSConverter {
     constructor() {
@@ -9,6 +9,13 @@ class LLMSConverter {
         this.errorMessage = document.getElementById('errorMessage');
         this.convertBtn = document.getElementById('convertBtn');
         this.previewBtn = document.getElementById('previewBtn');
+        this.currentJobId = null;
+        this.progressInterval = null;
+        
+        // API base URL - adjust for production
+        this.apiBase = (window.location.port === '8002' || window.location.port === '8080')
+            ? 'http://localhost:8001' 
+            : window.location.origin + '/api';
         
         this.initializeEventListeners();
         this.updateAPIKeyVisibility();
@@ -95,11 +102,7 @@ class LLMSConverter {
         this.hideError();
         
         try {
-            if (previewOnly) {
-                await this.simulatePreview(formData);
-            } else {
-                await this.simulateConversion(formData);
-            }
+            await this.processWithAPI(formData);
         } catch (error) {
             this.showError(error.message);
             this.hideProgress();
@@ -108,30 +111,30 @@ class LLMSConverter {
     
     getFormData() {
         return {
-            websiteUrl: document.getElementById('websiteUrl').value.trim(),
-            maxPages: parseInt(document.getElementById('maxPages').value),
+            website_url: document.getElementById('websiteUrl').value.trim(),
+            max_pages: parseInt(document.getElementById('maxPages').value),
             filename: document.getElementById('filename').value.trim() || 'LLMS',
-            useAI: document.getElementById('useAI').checked,
-            apiKey: document.getElementById('apiKey').value.trim()
+            use_ai: document.getElementById('useAI').checked,
+            api_key: document.getElementById('apiKey').value.trim()
         };
     }
     
     validateInputs(formData) {
-        if (!formData.websiteUrl) {
+        if (!formData.website_url) {
             this.showError('Please enter a website URL');
             return false;
         }
         
-        if (!this.validateURL(formData.websiteUrl)) {
+        if (!this.validateURL(formData.website_url)) {
             return false;
         }
         
-        if (formData.maxPages < 10 || formData.maxPages > 500) {
+        if (formData.max_pages < 10 || formData.max_pages > 500) {
             this.showError('Max pages must be between 10 and 500');
             return false;
         }
         
-        if (formData.useAI && !formData.apiKey) {
+        if (formData.use_ai && !formData.api_key) {
             this.showError('OpenAI API key is required for AI enhancement');
             return false;
         }
@@ -139,196 +142,73 @@ class LLMSConverter {
         return true;
     }
     
-    async simulatePreview(formData) {
-        // Simulate preview generation
-        const steps = [
-            'Validating URL...',
-            'Discovering pages...',
-            'Analyzing content...',
-            'Generating preview...'
-        ];
-        
-        for (let i = 0; i < steps.length; i++) {
-            this.updateProgress((i + 1) / steps.length * 100, steps[i]);
-            await this.delay(1000 + Math.random() * 1000);
-        }
-        
-        // Generate mock preview
-        const preview = this.generateMockPreview(formData);
-        this.showPreviewResults(preview, formData);
-        this.hideProgress();
-    }
-    
-    async simulateConversion(formData) {
-        // Simulate full conversion
-        const steps = [
-            'Validating URL...',
-            'Crawling website...',
-            'Extracting content...',
-            'Categorizing pages...',
-            formData.useAI ? 'Enhancing with AI...' : 'Processing content...',
-            'Generating LLMS.txt...',
-            'Creating downloads...',
-            'Complete!'
-        ];
-        
-        for (let i = 0; i < steps.length; i++) {
-            this.updateProgress((i + 1) / steps.length * 100, steps[i]);
+    async processWithAPI(formData) {
+        try {
+            // Start the processing job
+            this.updateProgress(0, 'Starting website processing...');
             
-            // Longer delay for AI enhancement
-            const delay = steps[i].includes('AI') ? 3000 : 1000 + Math.random() * 1000;
-            await this.delay(delay);
+            const response = await fetch(`${this.apiBase}/process-website`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to start processing');
+            }
+            
+            const startData = await response.json();
+            this.currentJobId = startData.job_id;
+            
+            // Start polling for progress
+            this.startProgressPolling();
+            
+        } catch (error) {
+            console.error('API Error:', error);
+            throw new Error(`Processing failed: ${error.message}`);
+        }
+    }
+    
+    startProgressPolling() {
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
         }
         
-        // Generate mock results
-        const results = this.generateMockResults(formData);
-        this.showResults(results, formData);
-        this.hideProgress();
-    }
-    
-    generateMockPreview(formData) {
-        const domain = new URL(formData.websiteUrl).hostname;
-        
-        return {
-            preview: `# ${domain.charAt(0).toUpperCase() + domain.slice(1)}
-
-> Professional services and solutions
-
-## Services
-- [Consulting Services](${formData.websiteUrl}/services/consulting): Expert guidance and strategic planning
-- [Implementation Support](${formData.websiteUrl}/services/implementation): Full-service implementation and setup
-- [Training Programs](${formData.websiteUrl}/services/training): Comprehensive training and education
-
-## About
-- [About Us](${formData.websiteUrl}/about): Company overview and mission
-- [Our Team](${formData.websiteUrl}/team): Meet our expert professionals
-
-## Resources
-- [Blog](${formData.websiteUrl}/blog): Latest insights and industry news
-- [Case Studies](${formData.websiteUrl}/case-studies): Success stories and examples
-
-## Contact
-- [Contact Us](${formData.websiteUrl}/contact): Get in touch with our team
-
-... (preview truncated)`,
-            stats: {
-                total_pages_found: Math.floor(Math.random() * 50) + 20,
-                preview_pages: 10
-            },
-            categories: {
-                'Services': 3,
-                'About': 2,
-                'Resources': 2,
-                'Contact': 1
+        this.progressInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`${this.apiBase}/job-status/${this.currentJobId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to get job status');
+                }
+                
+                const status = await response.json();
+                
+                // Update progress with enhanced information
+                this.updateProgress(status.progress, status.message, status.phase, status.current_page, status.total_pages);
+                
+                // Check if job is complete
+                if (status.status === 'completed') {
+                    clearInterval(this.progressInterval);
+                    this.showResults(status.result, status.filename);
+                    this.hideProgress();
+                } else if (status.status === 'error') {
+                    clearInterval(this.progressInterval);
+                    throw new Error(status.error || 'Processing failed');
+                }
+                
+            } catch (error) {
+                clearInterval(this.progressInterval);
+                this.showError(error.message);
+                this.hideProgress();
             }
-        };
+        }, 1000); // Poll every second
     }
     
-    generateMockResults(formData) {
-        const domain = new URL(formData.websiteUrl).hostname;
-        const totalPages = Math.min(formData.maxPages, Math.floor(Math.random() * 80) + 30);
-        
-        // Generate mock LLMS.txt content
-        const llmsContent = this.generateMockLLMSContent(domain, formData.websiteUrl, formData.useAI);
-        
-        return {
-            stats: {
-                total_rows: totalPages + 20,
-                indexable_pages: totalPages + 5,
-                unique_pages: totalPages
-            },
-            categories: {
-                'Services': Math.floor(totalPages * 0.3),
-                'Products': Math.floor(totalPages * 0.2),
-                'Resources': Math.floor(totalPages * 0.25),
-                'About': Math.floor(totalPages * 0.1),
-                'Locations': Math.floor(totalPages * 0.05),
-                'Contact': Math.floor(totalPages * 0.1)
-            },
-            files: {
-                txt_content: llmsContent,
-                json_content: JSON.stringify({
-                    metadata: {
-                        site_title: domain,
-                        site_url: formData.websiteUrl,
-                        generated_at: new Date().toISOString(),
-                        ai_enhanced: formData.useAI
-                    }
-                }, null, 2)
-            }
-        };
-    }
-    
-    generateMockLLMSContent(domain, url, aiEnhanced) {
-        const title = domain.charAt(0).toUpperCase() + domain.slice(1);
-        const enhancement = aiEnhanced ? ' (AI Enhanced)' : '';
-        
-        return `# ${title}
-
-> Professional services and comprehensive solutions${enhancement}
-
-<!-- Generated on ${new Date().toISOString().split('T')[0]} -->
-
-## Services
-- [Consulting Services](${url}/services/consulting): ${aiEnhanced ? 'Strategic guidance and expert consultation for business growth' : 'Professional consulting services'}
-- [Implementation Support](${url}/services/implementation): ${aiEnhanced ? 'End-to-end implementation with dedicated support team' : 'Full implementation support'}
-- [Custom Solutions](${url}/services/custom): ${aiEnhanced ? 'Tailored solutions designed for your specific needs' : 'Custom solution development'}
-
-## Products
-- [Enterprise Platform](${url}/products/enterprise): ${aiEnhanced ? 'Comprehensive enterprise solution with advanced analytics' : 'Enterprise platform solution'}
-- [Professional Tools](${url}/products/professional): ${aiEnhanced ? 'Professional-grade tools for enhanced productivity' : 'Professional software tools'}
-
-## Resources
-- [Knowledge Base](${url}/resources/knowledge): ${aiEnhanced ? 'Comprehensive guides and best practices documentation' : 'Knowledge base and documentation'}
-- [Blog](${url}/blog): ${aiEnhanced ? 'Industry insights and expert analysis on trends' : 'Company blog and articles'}
-- [Case Studies](${url}/case-studies): ${aiEnhanced ? 'Real success stories demonstrating proven results' : 'Customer case studies'}
-
-## About
-- [Company Overview](${url}/about): ${aiEnhanced ? 'Our mission, values, and commitment to excellence' : 'About our company'}
-- [Leadership Team](${url}/about/team): ${aiEnhanced ? 'Meet our experienced leadership and expert team' : 'Our team and leadership'}
-
-## Contact
-- [Get in Touch](${url}/contact): ${aiEnhanced ? 'Connect with our team for personalized assistance' : 'Contact information and forms'}
-- [Schedule Demo](${url}/demo): ${aiEnhanced ? 'Book a personalized demonstration of our solutions' : 'Schedule a product demo'}`;
-    }
-    
-    showPreviewResults(preview, formData) {
-        const resultsSection = document.getElementById('resultsSection');
-        
-        // Update title
-        resultsSection.querySelector('h2').textContent = '👁️ Preview Generated!';
-        
-        // Show stats
-        const statsGrid = document.getElementById('statsGrid');
-        statsGrid.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-number">${preview.stats.total_pages_found}</div>
-                <div class="stat-label">Pages Found</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">${preview.stats.preview_pages}</div>
-                <div class="stat-label">Pages Previewed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">${Object.keys(preview.categories).length}</div>
-                <div class="stat-label">Categories</div>
-            </div>
-        `;
-        
-        // Hide download buttons for preview
-        document.getElementById('downloadButtons').innerHTML = `
-            <button class="btn" onclick="llmsConverter.convertToFull()">
-                🔄 Generate Full LLMS.txt
-            </button>
-        `;
-        
-        // Show preview content
-        document.getElementById('previewContent').textContent = preview.preview;
-        
-        this.showResults();
-    }
-    
-    showResults(results, formData) {
+    showResults(results, filename) {
         const resultsSection = document.getElementById('resultsSection');
         
         // Update title
@@ -338,19 +218,19 @@ class LLMSConverter {
         const statsGrid = document.getElementById('statsGrid');
         statsGrid.innerHTML = `
             <div class="stat-card">
-                <div class="stat-number">${results.stats.total_rows}</div>
+                <div class="stat-number">${results.stats.total_rows || 0}</div>
                 <div class="stat-label">Total URLs</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">${results.stats.unique_pages}</div>
+                <div class="stat-number">${results.stats.unique_pages || 0}</div>
                 <div class="stat-label">Processed Pages</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">${Object.keys(results.categories).length}</div>
+                <div class="stat-number">${Object.keys(results.categories || {}).length}</div>
                 <div class="stat-label">Categories</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">${formData.useAI ? 'Yes' : 'No'}</div>
+                <div class="stat-number">${results.stats.ai_enhanced ? 'Yes' : 'No'}</div>
                 <div class="stat-label">AI Enhanced</div>
             </div>
         `;
@@ -358,51 +238,62 @@ class LLMSConverter {
         // Show download buttons
         const downloadButtons = document.getElementById('downloadButtons');
         downloadButtons.innerHTML = `
-            <button class="btn" onclick="llmsConverter.downloadFile('${formData.filename}.txt', 'text/plain')">
+            <button class="btn" onclick="llmsConverter.downloadFile('txt')">
                 📄 Download LLMS.txt
             </button>
-            <button class="btn btn-secondary" onclick="llmsConverter.downloadFile('${formData.filename}.json', 'application/json')">
+            <button class="btn btn-secondary" onclick="llmsConverter.downloadFile('json')">
                 📊 Download JSON
             </button>
         `;
         
-        // Show preview content (truncated)
-        const previewLines = results.files.txt_content.split('\n');
-        const truncated = previewLines.slice(0, 30).join('\n') + 
-                         (previewLines.length > 30 ? '\n\n... (truncated for preview)' : '');
-        document.getElementById('previewContent').textContent = truncated;
+        // Show preview content
+        document.getElementById('previewContent').textContent = results.preview || '';
         
         // Store results for download
         this.lastResults = results;
-        this.lastFormData = formData;
+        this.lastFilename = filename;
         
-        this.showResults();
+        this.showResultsSection();
     }
     
-    convertToFull() {
-        // Convert the preview to full conversion
-        this.handleConvert(false);
-    }
-    
-    downloadFile(filename, mimeType) {
-        if (!this.lastResults) return;
-        
-        let content;
-        if (filename.endsWith('.txt')) {
-            content = this.lastResults.files.txt_content;
-        } else if (filename.endsWith('.json')) {
-            content = this.lastResults.files.json_content;
+    async downloadFile(fileType) {
+        if (!this.currentJobId) {
+            this.showError('No job ID available for download');
+            return;
         }
         
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        try {
+            const response = await fetch(`${this.apiBase}/download/${this.currentJobId}/${fileType}`);
+            
+            if (!response.ok) {
+                throw new Error('Download failed');
+            }
+            
+            // Get the filename from Content-Disposition header or use default
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = `${this.lastFilename || 'LLMS'}.${fileType}`;
+            
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            // Create download
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            this.showError(`Download failed: ${error.message}`);
+        }
     }
     
     showProgress() {
@@ -415,14 +306,70 @@ class LLMSConverter {
         this.progressSection.style.display = 'none';
         this.convertBtn.disabled = false;
         this.previewBtn.disabled = false;
+        
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+        }
     }
     
-    updateProgress(percentage, text) {
+    updateProgress(percentage, text, phase = null, currentPage = null, totalPages = null) {
+        // Update progress bar
         document.getElementById('progressFill').style.width = percentage + '%';
         document.getElementById('progressText').textContent = text;
+        
+        // Update page counter
+        if (currentPage && totalPages) {
+            document.getElementById('pageCounter').textContent = `${currentPage} / ${totalPages} pages`;
+            
+            // Calculate estimated time
+            const useAI = document.getElementById('useAI').checked;
+            let estimatedSeconds;
+            if (useAI) {
+                // ~1-2 minutes per 50 pages with AI
+                estimatedSeconds = Math.ceil((totalPages / 50) * 90);
+            } else {
+                // ~2-5 seconds per page without AI
+                estimatedSeconds = totalPages * 3;
+            }
+            
+            const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
+            document.getElementById('estimatedTime').textContent = 
+                estimatedMinutes > 1 ? `~${estimatedMinutes} min` : '< 1 min';
+        }
+        
+        // Update phase indicators
+        if (phase) {
+            this.updatePhaseIndicators(phase);
+        }
     }
     
-    showResults() {
+    updatePhaseIndicators(currentPhase) {
+        const phases = ['crawling', 'processing', 'categorizing', 'enhancing', 'generating'];
+        const indicators = document.querySelectorAll('.phase-indicator');
+        
+        indicators.forEach((indicator, index) => {
+            const phaseData = indicator.getAttribute('data-phase');
+            const currentIndex = phases.indexOf(currentPhase);
+            const indicatorIndex = phases.indexOf(phaseData);
+            
+            indicator.classList.remove('active', 'completed');
+            
+            if (indicatorIndex < currentIndex) {
+                indicator.classList.add('completed');
+            } else if (indicatorIndex === currentIndex) {
+                indicator.classList.add('active');
+            }
+            
+            // Hide AI enhancement phase if not using AI
+            if (phaseData === 'enhancing') {
+                const useAI = document.getElementById('useAI').checked;
+                indicator.style.display = useAI ? 'block' : 'none';
+            }
+        });
+    }
+    
+    showResultsSection() {
         this.resultsSection.style.display = 'block';
     }
     
@@ -437,10 +384,6 @@ class LLMSConverter {
     
     hideError() {
         this.errorMessage.style.display = 'none';
-    }
-    
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
@@ -460,8 +403,17 @@ function resetTool() {
     document.getElementById('convertBtn').disabled = false;
     document.getElementById('previewBtn').disabled = false;
     
+    // Clear any ongoing polling
+    if (window.llmsConverter.progressInterval) {
+        clearInterval(window.llmsConverter.progressInterval);
+        window.llmsConverter.progressInterval = null;
+    }
+    
+    // Reset job ID
+    window.llmsConverter.currentJobId = null;
+    
     // Update API key visibility
-    llmsConverter.updateAPIKeyVisibility();
+    window.llmsConverter.updateAPIKeyVisibility();
 }
 
 // Initialize when DOM is loaded
