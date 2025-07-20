@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 400px;
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .setup-section {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .setup-section.complete {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        .setup-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #92400e;
+        }
+        
+        .setup-section.complete .setup-title {
+            color: #065f46;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            box-sizing: border-box;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 1px #4f46e5;
+        }
+        
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background: #4338ca;
+        }
+        
+        .btn.secondary {
+            background: #6b7280;
+        }
+        
+        .btn.secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .status-section {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-label {
+            color: #6b7280;
+        }
+        
+        .status-value {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .status-value.premium {
+            color: #059669;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #0c4a6e;
+        }
+        
+        .result {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        
+        .result.error {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+        
+        .result-header {
+            background: #f9fafb;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        
+        .result.error .result-header {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+        
+        .result-body {
+            padding: 12px;
+        }
+        
+        .alt-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .error-text {
+            font-size: 14px;
+            color: #dc2626;
+        }
+        
+        .copy-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .copy-btn:hover {
+            background: #4338ca;
+        }
+        
+        .no-results {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            padding: 20px;
+        }
+        
+        .help-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        
+        .help-link:hover {
+            text-decoration: underline;
+        }
+        
+        .upgrade-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .upgrade-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .upgrade-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .upgrade-btn {
+            background: white;
+            color: #4f46e5;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SEO Alt Text Optimizer</h1>
+        <p>Boost search rankings with AI-powered image descriptions</p>
+    </div>
+    
+    <div class="content">
+        <!-- API Key Setup Section -->
+        <div id="apiKeySection" class="setup-section">
+            <div class="setup-title">🔑 OpenAI API Key Required</div>
+            <div class="input-group">
+                <label for="apiKeyInput">Enter your OpenAI API key:</label>
+                <input type="password" id="apiKeyInput" placeholder="sk-proj-...">
+            </div>
+            <button class="btn" id="saveApiKey">Save API Key</button>
+            <a href="#" class="help-link" id="helpLink">How to get an API key?</a>
+        </div>
+
+        <!-- License Section -->
+        <div id="licenseSection" class="setup-section hidden">
+            <div class="setup-title">🚀 Upgrade Your License</div>
+            
+            <!-- Pricing Info -->
+            <div style="background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span><strong>Starter:</strong> 500 uses - $14.99</span>
+                    <a href="https://buy.stripe.com/7sYcN66Vt52U2BqfSgeUU04" target="_blank" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Buy →</a>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span><strong>Pro:</strong> Unlimited - $24.99</span>
+                    <a href="https://buy.stripe.com/aFaeVegw3gLCcc06hGeUU05" target="_blank" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Buy →</a>
+                </div>
+                <div style="text-align: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;">
+                    <a href="https://imagealttext.pro" target="_blank" style="color: #6b7280; text-decoration: none; font-size: 11px;">Visit imagealttext.pro</a>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="licenseInput">Enter your license key (optional):</label>
+                <input type="text" id="licenseInput" placeholder="XXX-XXX-###">
+            </div>
+            <button class="btn" id="saveLicense">Activate License</button>
+            <button class="btn secondary" id="buyLicense">Buy License</button>
+        </div>
+
+        <!-- Status Section -->
+        <div id="statusSection" class="status-section hidden">
+            <div class="status-row">
+                <span class="status-label">Status:</span>
+                <span class="status-value" id="userStatus">Free User</span>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Usage:</span>
+                <span class="status-value" id="dailyUsage">0/5 daily</span>
+            </div>
+            <div class="status-row">
+                <span class="status-label">API Key:</span>
+                <span class="status-value" id="apiKeyStatus">Not Set</span>
+            </div>
+        </div>
+
+        <!-- Upgrade Section for Free Users -->
+        <div id="upgradeSection" class="upgrade-section hidden">
+            <div class="upgrade-title">🚀 Upgrade for More SEO Power</div>
+            <div class="upgrade-subtitle">Better rankings • More usage • Unlimited access</div>
+            <button class="upgrade-btn" id="upgradeBtn">Get Pro License - $24.99</button>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions">
+            🚀 <strong>Boost Your SEO:</strong> Right-click any image and select "Generate AI Alt Text" to create search-optimized descriptions that improve rankings!
+        </div>
+        
+        <!-- Results Section -->
+        <div id="results">
+            <div class="no-results">
+                Set up your API key above to get started!
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - JunkDrawer.Tools</title>
+    <meta name="description" content="Tips, tutorials, and insights about digital tools, SEO, and productivity. Learn how to make the most of your digital toolbox.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .blog-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .blog-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .blog-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .articles-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: var(--primary-yellow);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .article-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .article-category {
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .article-date {
+            color: #888;
+        }
+
+        .article-card h2 {
+            font-family: var(--font-primary);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .article-excerpt {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .read-more {
+            font-family: var(--font-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--charcoal-gray);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .read-more:hover {
+            color: var(--primary-yellow);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .blog-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .article-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container blog-container">
+        <div class="blog-header">
+            <h1>The Tool Shed</h1>
+            <p>Tips, tutorials, and insights to help you make the most of your digital toolbox.</p>
+        </div>
+
+        <div class="articles-grid">
+            <a href="/blog/what-is-llms-txt-and-why-your-website-needs-one/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">AI Search</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>What is LLMS.txt and Why Your Website Needs One</h2>
+                <p class="article-excerpt">
+                    Discover how LLMS.txt files help AI search engines understand your content better. 
+                    Learn the format, benefits, and implementation strategies for better AI visibility.
+                </p>
+                <span class="read-more">Read Guide →</span>
+            </a>
+
+            <a href="/blog/screaming-frog-to-llms-txt-complete-guide/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">Tutorial</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>From Screaming Frog to LLMS.txt: Complete Guide</h2>
+                <p class="article-excerpt">
+                    Professional tutorial for converting Screaming Frog CSV exports into perfectly 
+                    formatted LLMS.txt files. Includes automation tips and quality checks.
+                </p>
+                <span class="read-more">Read Tutorial →</span>
+            </a>
+
+            <a href="/blog/ai-search-optimization-llms-txt-best-practices/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">AI Search</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>AI Search Optimization: LLMS.txt Best Practices</h2>
+                <p class="article-excerpt">
+                    Advanced strategies for optimizing your LLMS.txt files for maximum AI search visibility. 
+                    Covers categorization, content enhancement, and performance measurement.
+                </p>
+                <span class="read-more">Read Guide →</span>
+            </a>
+
+            <a href="/blog/how-to-get-openai-api-key/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">Tutorial</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>How to Get OpenAI API Key: Complete Guide</h2>
+                <p class="article-excerpt">
+                    Step-by-step tutorial on getting your OpenAI API key in 2025. Includes setup costs, 
+                    usage limits, security tips, and troubleshooting common issues.
+                </p>
+                <span class="read-more">Read Full Guide →</span>
+            </a>
+
+            <a href="/blog/ai-search-alt-text-optimization/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">SEO</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>AI Search & Alt Text Optimization</h2>
+                <p class="article-excerpt">
+                    Learn how AI-powered search engines are changing SEO and why optimized alt text 
+                    is more important than ever for image discoverability.
+                </p>
+                <span class="read-more">Read Article →</span>
+            </a>
+
+            <a href="/blog/image-seo-guide-2025/" class="article-card">
+                <div class="article-meta">
+                    <span class="article-category">SEO</span>
+                    <span class="article-date">January 2025</span>
+                </div>
+                <h2>Complete Image SEO Guide for 2025</h2>
+                <p class="article-excerpt">
+                    Master image SEO with this comprehensive guide. Cover file optimization, alt text, 
+                    structured data, and technical best practices for better rankings.
+                </p>
+                <span class="read-more">Read Guide →</span>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <p style="color: #666; font-style: italic;">More articles coming soon. Got a topic suggestion? <a href="mailto:hello@junkdrawer.tools" style="color: var(--primary-yellow);">Let us know!</a></p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools - Built with caffeine and questionable decisions</p>
+        </div>
+    </footer>
+</body>
+</html>

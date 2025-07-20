@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "SEO Alt Text Optimizer", 
+  "version": "3.1.0",
+  "description": "Right-click any image to generate alt text. Works everywhere on the web.",
+  "permissions": [
+    "contextMenus",
+    "activeTab", 
+    "storage",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Alt Text Generator"
+  }
+}

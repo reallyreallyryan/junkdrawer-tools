@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P8DRBL524D"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-P8DRBL524D');
+    </script>
+
+    <title>Alt Text Optimizer - Generate SEO-Friendly Alt Text Instantly</title>
+    <meta name="description" content="Chrome extension that generates SEO-optimized alt text for any image with one click. Uses your OpenAI API key. Starter $14.99, Pro $24.99.">
+    <meta name="keywords" content="alt text generator, image SEO, alt text optimizer, Chrome extension">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Alt Text Optimizer - Generate SEO-Friendly Alt Text">
+    <meta property="og:description" content="Right-click any image to generate SEO-optimized alt text instantly. Works everywhere on the web.">
+    <meta property="og:type" content="website">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .pricing-cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 250px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pricing-card.recommended {
+            background: white;
+            transform: scale(1.05);
+            border: 2px solid #ffd700;
+            position: relative;
+        }
+        
+        .recommended-badge {
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .pricing-subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features li {
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .pricing-features li::before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .cta-button:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cta-button.starter {
+            background: #059669;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+        
+        .cta-button.starter:hover {
+            background: #047857;
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        }
+        
+        .requirement-note {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .requirement-note a {
+            color: #ffd700;
+            text-decoration: underline;
+        }
+        
+        /* How it works */
+        .how-it-works {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+        
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .step {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        
+        .step h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .step p {
+            color: #4a5568;
+        }
+        
+        /* Benefits */
+        .benefits {
+            padding: 80px 0;
+        }
+        
+        .benefits h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #2d3748;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .benefit {
+            text-align: center;
+            padding: 30px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .benefit-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .benefit h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .benefit p {
+            color: #4a5568;
+        }
+        
+        /* Target audience */
+        .target-audience {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+        
+        .target-audience h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #2d3748;
+        }
+        
+        .audience-list {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .audience-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .audience-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+        
+        .audience-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .audience-list li::before {
+            content: "✅ ";
+            color: #48bb78;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        /* Final CTA */
+        .final-cta {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .final-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .final-cta p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 20px;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pricing-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pricing-card.recommended {
+                transform: none;
+                margin: 10px 0;
+            }
+            
+            .steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <h1>Alt Text Optimizer</h1>
+            <p>Generate SEO-friendly alt text for any image with one click</p>
+            
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-title">Starter</div>
+                    <div class="pricing-price">$14.99</div>
+                    <div class="pricing-subtitle">One-time purchase</div>
+                    <ul class="pricing-features">
+                        <li>500 AI generations</li>
+                        <li>Works on any website</li>
+                        <li>SEO-optimized descriptions</li>
+                        <li>No monthly fees</li>
+                    </ul>
+                    <a href="#" class="cta-button starter" id="buyStarter">Get Starter License</a>
+                </div>
+                
+                <div class="pricing-card recommended">
+                    <div class="recommended-badge">BEST VALUE</div>
+                    <div class="pricing-title">Pro</div>
+                    <div class="pricing-price">$24.99</div>
+                    <div class="pricing-subtitle">One-time purchase</div>
+                    <ul class="pricing-features">
+                        <li>Unlimited AI generations</li>
+                        <li>Works on any website</li>
+                        <li>SEO-optimized descriptions</li>
+                        <li>Priority support</li>
+                        <li>Future updates included</li>
+                    </ul>
+                    <a href="#" class="cta-button" id="buyPro">Get Pro License</a>
+                </div>
+            </div>
+            
+            <div class="requirement-note">
+                <strong>Requires:</strong> Your own OpenAI API key (~$0.02 per image)<br>
+                <a href="/how-to-get-openai-api-key/">Learn how to get your API key →</a>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                ⚡ Instant download • 🔒 Secure payment • 💡 Works on any website
+            </p>
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Install Extension</h3>
+                    <p>Add the Chrome extension to your browser</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Add API Key</h3>
+                    <p>Enter your OpenAI API key in the extension</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Right-Click Images</h3>
+                    <p>Right-click any image and select "Generate Alt Text"</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Copy & Use</h3>
+                    <p>Get SEO-optimized alt text instantly</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="benefits">
+        <div class="container">
+            <h2>Why Choose Alt Text Optimizer</h2>
+            <div class="benefits-grid">
+                <div class="benefit">
+                    <div class="benefit-icon">⚡</div>
+                    <h3>Works Anywhere</h3>
+                    <p>Right-click images on any website - WordPress, Shopify, social media, anywhere on the web.</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🎯</div>
+                    <h3>SEO Optimized</h3>
+                    <p>Generates keyword-rich, search-friendly descriptions that help improve your image rankings.</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">💰</div>
+                    <h3>One-Time Purchase</h3>
+                    <p>Pay once, use forever. No monthly subscriptions or recurring fees.</p>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🚀</div>
+                    <h3>Save Time</h3>
+                    <p>Generate professional alt text in seconds instead of spending minutes writing each one manually.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Audience -->
+    <div class="target-audience">
+        <div class="container">
+            <h2>Perfect For</h2>
+            <div class="audience-list">
+                <ul>
+                    <li>Content creators and bloggers</li>
+                    <li>SEO professionals and marketers</li>
+                    <li>Web developers and designers</li>
+                    <li>E-commerce store owners</li>
+                    <li>Anyone who works with images online</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="final-cta">
+        <div class="container">
+            <h2>Start Optimizing Your Images Today</h2>
+            <p>Join hundreds of professionals using Alt Text Optimizer to save time and improve SEO</p>
+            <div style="margin-top: 30px;">
+                <a href="#" class="cta-button starter" id="buyStarterFinal" style="margin-right: 20px;">Get Starter - $14.99</a>
+                <a href="#" class="cta-button" id="buyProFinal">Get Pro - $24.99</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                ✅ Instant access • ✅ One-time payment • ✅ No monthly fees
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="/blog/">SEO Tips</a>
+                <a href="/how-to-get-openai-api-key/">API Key Guide</a>
+                <a href="mailto:nectarstack@gmail.com">Contact</a>
+                <a href="/privacy-policy/">Privacy Policy</a>
+            </div>
+            <p>&copy; 2025 Alt Text Optimizer. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple button click handlers - you'll replace with actual Stripe links
+        document.getElementById('buyStarter').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://buy.stripe.com/7sYcN66Vt52U2BqfSgeUU04', '_blank');
+        });
+        
+        document.getElementById('buyPro').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://buy.stripe.com/aFaeVegw3gLCcc06hGeUU05', '_blank');
+        });
+        
+        document.getElementById('buyStarterFinal').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://buy.stripe.com/7sYcN66Vt52U2BqfSgeUU04', '_blank');
+        });
+        
+        document.getElementById('buyProFinal').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://buy.stripe.com/aFaeVegw3gLCcc06hGeUU05', '_blank');
+        });
+    </script>
+</body>
+</html>

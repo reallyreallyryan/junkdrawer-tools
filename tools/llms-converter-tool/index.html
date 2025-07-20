@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLMS.txt Converter - JunkDrawer.Tools</title>
+    <meta name="description" content="Convert any website into an AI-optimized LLMS.txt file. Enter a URL and get perfectly formatted content for AI search engines and language models.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .tool-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .form-group input[type="url"],
+        .form-group input[type="number"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 200px 200px;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-yellow);
+        }
+
+        .btn {
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #f1c40f;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--charcoal-gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #495057;
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-yellow);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--charcoal-gray);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #feb2b2;
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--charcoal-gray);
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1>LLMS.txt Converter</h1>
+            <p>Convert any website into an AI-optimized LLMS.txt file. Perfect for AI search engines, chatbots, and language model training.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>🧠 What is LLMS.txt?</h3>
+            <p>LLMS.txt is a standardized format that helps AI systems understand and navigate your website content. It organizes your pages by category and includes optimized descriptions for better AI search visibility.</p>
+            <ul>
+                <li>Improves discoverability in ChatGPT, Claude, and Perplexity</li>
+                <li>Organizes content by Services, Products, Resources, etc.</li>
+                <li>Optional AI enhancement for better titles and descriptions</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <form id="llmsForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="websiteUrl">Website URL</label>
+                        <input type="url" id="websiteUrl" name="websiteUrl" 
+                               placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxPages">Max Pages</label>
+                        <input type="number" id="maxPages" name="maxPages" 
+                               value="100" min="10" max="500">
+                    </div>
+                    <div class="form-group">
+                        <label for="filename">Filename</label>
+                        <input type="text" id="filename" name="filename" 
+                               placeholder="LLMS" value="LLMS">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="useAI" name="useAI" checked>
+                    <label for="useAI">✨ Enhance with AI (requires OpenAI API key)</label>
+                </div>
+
+                <div class="form-group" id="apiKeyGroup">
+                    <label for="apiKey">OpenAI API Key (optional)</label>
+                    <input type="password" id="apiKey" name="apiKey" 
+                           placeholder="sk-...">
+                    <small style="color: #666; font-size: 0.875rem;">
+                        Your API key is only used for this conversion and never stored.
+                        <a href="/blog/how-to-get-openai-api-key/" target="_blank">Need an API key?</a>
+                    </small>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn" id="convertBtn">
+                        🔄 Convert to LLMS.txt
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="previewBtn" style="margin-left: 1rem;">
+                        👁️ Preview First
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing...</div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>✅ Conversion Complete!</h2>
+            
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+
+            <div class="download-buttons" id="downloadButtons">
+                <!-- Download buttons will be populated by JavaScript -->
+            </div>
+
+            <div>
+                <h3>Preview</h3>
+                <div class="preview-section">
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="button" class="btn btn-secondary" onclick="resetTool()">
+                    🔄 Convert Another Website
+                </button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools - Built with caffeine and questionable decisions</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
