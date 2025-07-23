@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Railway production startup script for JunkDrawer.Tools
-Simplified approach - serve everything from the LLMS app
+Creates a unified FastAPI app that serves both static files and API endpoints
 """
 
 import os
@@ -12,81 +12,97 @@ from pathlib import Path
 llms_path = Path(__file__).parent / "tools" / "llms-converter"
 sys.path.insert(0, str(llms_path))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 import uvicorn
 
 # Import the LLMS converter app
 try:
+    # Set the API root path environment variable before importing
+    os.environ["API_ROOT_PATH"] = "/api"
     from app import app as llms_app
-    # Use the LLMS app as the main app
-    app = llms_app
-    
-    # Add static file serving to the existing app
-    project_root = Path(__file__).parent
-    
-    # Serve main pages
-    @app.get("/")
-    async def serve_index():
-        return FileResponse(str(project_root / "index.html"))
-    
-    @app.get("/styles.css")
-    async def serve_styles():
-        return FileResponse(str(project_root / "styles.css"))
-    
-    @app.get("/script.js")
-    async def serve_script():
-        return FileResponse(str(project_root / "script.js"))
-    
-    # Tool pages
-    @app.get("/tools/alt-text-generator/")
-    async def serve_alt_text_tool():
-        file_path = project_root / "tools" / "alt-text-generator" / "index.html"
+    LLMS_AVAILABLE = True
+except ImportError:
+    print("⚠️  LLMS converter backend not available")
+    LLMS_AVAILABLE = False
+
+# Create main app
+app = FastAPI(title="JunkDrawer.Tools", version="1.0.0")
+
+# Mount the LLMS converter API if available
+if LLMS_AVAILABLE:
+    app.mount("/api", llms_app, name="llms_api")
+    print("✅ LLMS converter API mounted at /api")
+
+# Serve static files for the root directory
+project_root = Path(__file__).parent
+
+# Serve main pages
+@app.get("/")
+async def serve_index():
+    return FileResponse(str(project_root / "index.html"))
+
+@app.get("/styles.css")
+async def serve_styles():
+    return FileResponse(str(project_root / "styles.css"))
+
+@app.get("/script.js")
+async def serve_script():
+    return FileResponse(str(project_root / "script.js"))
+
+# Tool-specific routes
+@app.get("/tools/alt-text-generator/")
+async def serve_alt_text_tool():
+    file_path = project_root / "tools" / "alt-text-generator" / "index.html"
+    return FileResponse(str(file_path))
+
+@app.get("/tools/alt-text-generator/{filename}")
+async def serve_alt_text_files(filename: str):
+    file_path = project_root / "tools" / "alt-text-generator" / filename
+    if file_path.exists() and file_path.is_file():
         return FileResponse(str(file_path))
-    
-    @app.get("/tools/llms-converter/")
-    async def serve_llms_tool():
-        file_path = project_root / "tools" / "llms-converter" / "index.html"
+    return {"error": "File not found"}, 404
+
+@app.get("/tools/llms-converter/")
+async def serve_llms_tool():
+    file_path = project_root / "tools" / "llms-converter" / "index.html"
+    return FileResponse(str(file_path))
+
+@app.get("/tools/llms-converter/{filename}")
+async def serve_llms_files(filename: str):
+    file_path = project_root / "tools" / "llms-converter" / filename
+    if file_path.exists() and file_path.is_file():
         return FileResponse(str(file_path))
-    
-    @app.get("/tools/{tool}/{filename:path}")
-    async def serve_tool_files(tool: str, filename: str):
-        file_path = project_root / "tools" / tool / filename
-        if file_path.exists() and file_path.is_file():
-            return FileResponse(str(file_path))
-        return {"error": "File not found"}, 404
-    
-    # Blog routes
-    @app.get("/blog/")
-    async def serve_blog_index():
-        return FileResponse(str(project_root / "blog" / "index.html"))
-    
-    @app.get("/blog/{path:path}")
-    async def serve_blog_files(path: str):
-        file_path = project_root / "blog" / path
-        if file_path.is_dir():
-            index_path = file_path / "index.html"
-            if index_path.exists():
-                return FileResponse(str(index_path))
-        elif file_path.exists() and file_path.is_file():
-            return FileResponse(str(file_path))
-        return {"error": "File not found"}, 404
-    
-    # Mount static files for remaining assets
-    app.mount("/", StaticFiles(directory=str(project_root), html=True), name="static")
-    
-    print("✅ Using LLMS app as main app with added static routes")
-    
-except ImportError as e:
-    print(f"❌ Cannot start - LLMS converter backend required: {e}")
-    sys.exit(1)
+    return {"error": "File not found"}, 404
+
+# Blog routes
+@app.get("/blog/")
+async def serve_blog_index():
+    return FileResponse(str(project_root / "blog" / "index.html"))
+
+@app.get("/blog/{path:path}")
+async def serve_blog_files(path: str):
+    file_path = project_root / "blog" / path
+    # Handle directory requests by serving index.html
+    if file_path.is_dir():
+        index_path = file_path / "index.html"
+        if index_path.exists():
+            return FileResponse(str(index_path))
+    elif file_path.exists() and file_path.is_file():
+        return FileResponse(str(file_path))
+    return {"error": "File not found"}, 404
+
+# Mount static files for any remaining assets
+app.mount("/", StaticFiles(directory=str(project_root), html=True), name="static")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"🚀 Starting JunkDrawer.Tools on port {port}")
-    print("✅ API endpoints available at root level")
-    print(f"📚 API documentation at http://localhost:{port}/docs")
+    
+    if LLMS_AVAILABLE:
+        print("✅ LLMS converter API available at /api")
+        print(f"📚 API documentation at http://localhost:{port}/api/docs")
     
     uvicorn.run(
         app, 
