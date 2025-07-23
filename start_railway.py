@@ -45,6 +45,11 @@ if LLMS_AVAILABLE:
     app.mount("/api", llms_app, name="llms_api")
     print("✅ LLMS converter API mounted at /api")
 
+    @app.post("/api/process-website")
+    async def proxy_process_website(request: Request):
+        # Forward the request to the mounted app
+        return await llms_app.process_website(await request.json())
+
 # Serve static files for the root directory
 project_root = Path(__file__).parent
 
