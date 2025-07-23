@@ -10,7 +10,7 @@ from pathlib import Path
 
 # No backend tools needed - all tools are frontend-only
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,6 +48,23 @@ async def serve_styles():
 @app.get("/script.js")
 async def serve_script():
     return FileResponse(str(project_root / "script.js"))
+
+# Serve sitemap and robots.txt
+@app.get("/sitemap.xml")
+async def serve_sitemap():
+    file_path = project_root / "sitemap.xml"
+    if file_path.exists():
+        return FileResponse(str(file_path), media_type="application/xml")
+    # If file doesn't exist, return 404
+    raise HTTPException(status_code=404, detail="Sitemap not found")
+
+@app.get("/robots.txt")
+async def serve_robots():
+    file_path = project_root / "robots.txt"
+    if file_path.exists():
+        return FileResponse(str(file_path), media_type="text/plain")
+    # If file doesn't exist, return 404
+    raise HTTPException(status_code=404, detail="Robots.txt not found")
 
 # Tool-specific routes
 @app.get("/tools/alt-text-generator/")

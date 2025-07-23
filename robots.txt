@@ -1,0 +1,58 @@
+# Robots.txt for JunkDrawer.Tools
+# https://junkdrawer.tools/
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://junkdrawer.tools/sitemap.xml
+
+# Specific instructions for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# AI crawlers - explicitly allow
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Block any sensitive directories (if they exist)
+User-agent: *
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /.env
+Disallow: /venv/
+Disallow: /__pycache__/
+
+# Allow access to all assets
+Allow: /styles.css
+Allow: /script.js
+Allow: *.js
+Allow: *.css
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.png
+Allow: *.gif
+Allow: *.webp
+
+# No crawl delay for assets
+User-agent: *
+Allow: /tools/
+Allow: /blog/

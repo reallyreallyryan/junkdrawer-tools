@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>https://junkdrawer.tools/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Tools -->
+  <url>
+    <loc>https://junkdrawer.tools/tools/alt-text-generator/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://junkdrawer.tools/tools/title-tag-counter/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Blog Index -->
+  <url>
+    <loc>https://junkdrawer.tools/blog/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Blog Articles -->
+  <url>
+    <loc>https://junkdrawer.tools/blog/what-is-llms-txt-and-why-your-website-needs-one/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://junkdrawer.tools/blog/how-to-get-openai-api-key/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://junkdrawer.tools/blog/ai-search-alt-text-optimization/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://junkdrawer.tools/blog/image-seo-guide-2025/</loc>
+    <lastmod>2025-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
