@@ -1,0 +1,49 @@
+# JunkDrawer.Tools
+
+> Your digital tool chest - free, API-powered utilities that just work. Bring your own API keys for privacy-first tools.
+
+## Tools
+
+- [Alt Text Generator](https://junkdrawer.tools/tools/alt-text-generator/): Generate SEO-friendly alt text for images using AI. Upload multiple images and get AI-powered descriptions for better accessibility and SEO. Uses OpenAI GPT-4 for accurate, contextual descriptions.
+
+- [Title Tag Length Tester](https://junkdrawer.tools/tools/title-tag-counter/): Test your page titles to ensure they don't get cut off in Google search results. Real-time pixel width testing for both desktop (600px) and mobile (350px) views.
+
+## Resources
+
+- [Blog](https://junkdrawer.tools/blog/): Tips, tutorials, and insights about digital tools, SEO, and productivity.
+
+- [What is LLMS.txt](https://junkdrawer.tools/blog/what-is-llms-txt-and-why-your-website-needs-one/): Learn how LLMS.txt files help AI search engines understand your content better. Discover optimization strategies for the new era of AI-powered search.
+
+- [How to Get OpenAI API Key](https://junkdrawer.tools/blog/how-to-get-openai-api-key/): Step-by-step guide to obtaining your OpenAI API key. Includes setup costs, usage limits, security tips, and troubleshooting.
+
+- [AI Search & Alt Text](https://junkdrawer.tools/blog/ai-search-alt-text-optimization/): How AI search engines like ChatGPT and Bard use alt text. Optimization strategies for AI-powered search and discovery.
+
+- [Image SEO Guide 2025](https://junkdrawer.tools/blog/image-seo-guide-2025/): Complete guide to image SEO including alt text best practices, file optimization, and technical implementation.
+
+## About
+
+JunkDrawer.Tools is a collection of genuinely useful utilities that don't require signups, subscriptions, or surrendering your data. Just bring your own API keys and get to work. No corporate fluff, no dark patterns, just tools that respect your time and privacy.
+
+## Features
+
+- **Privacy-First**: All API keys are stored locally in your browser, never on our servers
+- **Direct API Calls**: Your data goes directly to service providers (like OpenAI), not through our systems  
+- **No Registration**: No accounts, no tracking, no data collection
+- **Open Source**: Transparent code you can inspect and trust
+- **Free Forever**: No premium tiers, no paywalls, just useful tools
+
+## Use Cases
+
+- **SEO Professionals**: Optimize images with AI-generated alt text
+- **Content Creators**: Ensure titles display properly in search results
+- **Web Developers**: Quick utilities for common tasks
+- **Digital Marketers**: Tools for better search visibility
+- **Accessibility Advocates**: Generate descriptive alt text for screen readers
+
+## Technical Details
+
+- Built with vanilla JavaScript, no heavy frameworks
+- Static site hosted on Railway
+- Frontend-only architecture for maximum privacy
+- Responsive design works on all devices
+- Direct integration with OpenAI API for AI features

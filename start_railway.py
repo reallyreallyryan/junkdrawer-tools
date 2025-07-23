@@ -66,6 +66,14 @@ async def serve_robots():
     # If file doesn't exist, return 404
     raise HTTPException(status_code=404, detail="Robots.txt not found")
 
+@app.get("/llms.txt")
+async def serve_llms():
+    file_path = project_root / "llms.txt"
+    if file_path.exists():
+        return FileResponse(str(file_path), media_type="text/plain")
+    # If file doesn't exist, return 404
+    raise HTTPException(status_code=404, detail="LLMS.txt not found")
+
 # Tool-specific routes
 @app.get("/tools/alt-text-generator/")
 async def serve_alt_text_tool():
