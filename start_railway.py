@@ -18,17 +18,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-# Import the LLMS converter app
-try:
-    # Set the API root path environment variable before importing
-    os.environ["API_ROOT_PATH"] = "/api"
-    from app import app as llms_app
-    LLMS_AVAILABLE = True
-except ImportError:
-    print("⚠️  LLMS converter backend not available")
-    LLMS_AVAILABLE = False
-
-# Create main app
+# Create main app FIRST
 app = FastAPI(title="JunkDrawer.Tools", version="1.0.0")
 
 # Add CORS middleware to handle cross-origin requests
@@ -40,15 +30,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Import the LLMS converter app
+try:
+    # Set the API root path environment variable before importing
+    os.environ["API_ROOT_PATH"] = "/api"
+    from app import app as llms_app
+    from app import process_website, get_job_status, download_file
+    LLMS_AVAILABLE = True
+    print("✅ Successfully imported LLMS converter")
+except ImportError as e:
+    print(f"⚠️  LLMS converter backend not available: {e}")
+    LLMS_AVAILABLE = False
+except Exception as e:
+    print(f"❌ Error importing LLMS converter: {e}")
+    LLMS_AVAILABLE = False
+
 # Mount the LLMS converter API if available
 if LLMS_AVAILABLE:
+    # Option 1: Just mount the sub-app (try this first)
     app.mount("/api", llms_app, name="llms_api")
     print("✅ LLMS converter API mounted at /api")
-
-    @app.post("/api/process-website")
-    async def proxy_process_website(request: Request):
-        # Forward the request to the mounted app
-        return await llms_app.process_website(await request.json())
+    
+    # Option 2: If mounting doesn't work in production, uncomment these lines
+    # and comment out the mount above:
+    # app.add_api_route("/api/process-website", process_website, methods=["POST"])
+    # app.add_api_route("/api/job-status/{job_id}", get_job_status, methods=["GET"])
+    # app.add_api_route("/api/download/{job_id}/{file_type}", download_file, methods=["GET"])
 
 # Serve static files for the root directory
 project_root = Path(__file__).parent
