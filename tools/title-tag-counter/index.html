@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title Tag Length Tester - JunkDrawer.Tools</title>
+    <meta name="description" content="Test your page titles and taglines to ensure they don't get cut off in Google search results. Real-time pixel width testing for SEO optimization.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .tool-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: Arial, sans-serif;
+            transition: border-color 0.3s ease;
+            resize: none;
+            min-height: 60px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .toggle-btn {
+            background: #f8f9fa;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            color: var(--charcoal-gray);
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--primary-yellow);
+        }
+
+        .preview-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .preview-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .preview-box {
+            background: #f8f9fa;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-text {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            color: #1a0dab;
+            line-height: 1.2;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .width-limit-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ff4444;
+            z-index: 10;
+        }
+
+        .width-limit-line::after {
+            content: attr(data-limit);
+            position: absolute;
+            top: -25px;
+            right: -30px;
+            background: #ff4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+
+        .stat-value.danger {
+            color: #ef4444;
+        }
+
+        .stat-value.success {
+            color: #10b981;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-primary);
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--charcoal-gray);
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .view-toggle {
+                flex-direction: column;
+            }
+            
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1>Title Tag Length Tester</h1>
+            <p>Test your page titles and taglines to ensure they don't get cut off in Google search results. Real-time pixel width testing for SEO optimization.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>📏 How it works</h3>
+            <ul>
+                <li>Enter your page title or tagline in the text box</li>
+                <li>See real-time pixel width calculation</li>
+                <li>Toggle between Desktop (600px limit) and Mobile (350px limit) views</li>
+                <li>Get instant feedback on whether your text will be truncated in search results</li>
+                <li>Copy your optimized text when ready</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <div class="form-group">
+                <label for="titleInput">Enter your title or tagline:</label>
+                <textarea id="titleInput" class="text-input" 
+                         placeholder="Type your page title here..." 
+                         rows="2"></textarea>
+            </div>
+
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="desktopBtn" data-view="desktop">
+                    🖥️ Desktop (600px)
+                </button>
+                <button class="toggle-btn" id="mobileBtn" data-view="mobile">
+                    📱 Mobile (350px)
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h3 style="margin-bottom: 1rem; color: var(--charcoal-gray);">Preview</h3>
+            <div class="preview-container">
+                <div class="preview-box" id="previewBox">
+                    <div class="width-limit-line" id="widthLimit" data-limit="600px"></div>
+                    <p class="preview-text" id="previewText">Type your page title here...</p>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value success" id="pixelWidth">0</div>
+                    <div class="stat-label">Pixel Width</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="charCount">0</div>
+                    <div class="stat-label">Character Count</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success" id="status">✅ Perfect</div>
+                    <div class="stat-label">Status</div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="copy-btn" id="copyBtn" disabled>
+                    📋 Copy Text
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools - Built with caffeine and questionable decisions</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

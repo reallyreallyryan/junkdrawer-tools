@@ -8,9 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-# Add the LLMS converter backend to Python path
-llms_path = Path(__file__).parent / "tools" / "llms-converter"
-sys.path.insert(0, str(llms_path))
+# No backend tools needed - all tools are frontend-only
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -30,32 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Import the LLMS converter app
-try:
-    # Set the API root path environment variable before importing
-    os.environ["API_ROOT_PATH"] = "/api"
-    from app import app as llms_app
-    from app import process_website, get_job_status, download_file
-    LLMS_AVAILABLE = True
-    print("✅ Successfully imported LLMS converter")
-except ImportError as e:
-    print(f"⚠️  LLMS converter backend not available: {e}")
-    LLMS_AVAILABLE = False
-except Exception as e:
-    print(f"❌ Error importing LLMS converter: {e}")
-    LLMS_AVAILABLE = False
+# All tools are now frontend-only
+LLMS_AVAILABLE = False
 
-# Mount the LLMS converter API if available
-if LLMS_AVAILABLE:
-    # Option 1: Just mount the sub-app (try this first)
-    app.mount("/api", llms_app, name="llms_api")
-    print("✅ LLMS converter API mounted at /api")
-    
-    # Option 2: If mounting doesn't work in production, uncomment these lines
-    # and comment out the mount above:
-    # app.add_api_route("/api/process-website", process_website, methods=["POST"])
-    # app.add_api_route("/api/job-status/{job_id}", get_job_status, methods=["GET"])
-    # app.add_api_route("/api/download/{job_id}/{file_type}", download_file, methods=["GET"])
+# No API mounting needed - all tools are frontend-only
 
 # Serve static files for the root directory
 project_root = Path(__file__).parent
@@ -86,14 +62,14 @@ async def serve_alt_text_files(filename: str):
         return FileResponse(str(file_path))
     return {"error": "File not found"}, 404
 
-@app.get("/tools/llms-converter/")
-async def serve_llms_tool():
-    file_path = project_root / "tools" / "llms-converter" / "index.html"
+@app.get("/tools/title-tag-counter/")
+async def serve_title_tag_tool():
+    file_path = project_root / "tools" / "title-tag-counter" / "index.html"
     return FileResponse(str(file_path))
 
-@app.get("/tools/llms-converter/{filename}")
-async def serve_llms_files(filename: str):
-    file_path = project_root / "tools" / "llms-converter" / filename
+@app.get("/tools/title-tag-counter/{filename}")
+async def serve_title_tag_files(filename: str):
+    file_path = project_root / "tools" / "title-tag-counter" / filename
     if file_path.exists() and file_path.is_file():
         return FileResponse(str(file_path))
     return {"error": "File not found"}, 404
@@ -122,9 +98,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"🚀 Starting JunkDrawer.Tools on port {port}")
     
-    if LLMS_AVAILABLE:
-        print("✅ LLMS converter API available at /api")
-        print(f"📚 API documentation at http://localhost:{port}/api/docs")
+    print("✅ All frontend tools ready")
     
     uvicorn.run(
         app, 
