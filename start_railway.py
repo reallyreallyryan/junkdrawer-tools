@@ -15,6 +15,7 @@ sys.path.insert(0, str(llms_path))
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 # Import the LLMS converter app
@@ -29,6 +30,15 @@ except ImportError:
 
 # Create main app
 app = FastAPI(title="JunkDrawer.Tools", version="1.0.0")
+
+# Add CORS middleware to handle cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your domain
+    allow_credentials=True,
+    allow_methods=["*"],  # This ensures all HTTP methods are allowed
+    allow_headers=["*"],
+)
 
 # Mount the LLMS converter API if available
 if LLMS_AVAILABLE:

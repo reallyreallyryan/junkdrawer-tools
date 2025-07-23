@@ -26,10 +26,15 @@ class LLMSConverter {
         
         // Development environment
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            if (port === '8002' || port === '8080') {
+            // When running via start_railway.py, the API is at /api
+            if (port === '8080' || port === '8000') {
+                return window.location.origin + '/api';
+            }
+            // When running separate dev servers
+            if (port === '8002') {
                 return 'http://localhost:8001';
             }
-            // Railway or production with API mounted at /api
+            // Default for local development
             return window.location.origin + '/api';
         }
         
