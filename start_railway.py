@@ -12,9 +12,9 @@ from pathlib import Path
 llms_path = Path(__file__).parent / "tools" / "llms-converter"
 sys.path.insert(0, str(llms_path))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 import uvicorn
 
 # Import the LLMS converter app
@@ -33,34 +33,74 @@ if LLMS_AVAILABLE:
     app.mount("/api", llms_app)
     print("✅ LLMS converter API mounted at /api")
 
-# Serve static files
+# Serve static files for the root directory
 project_root = Path(__file__).parent
-app.mount("/static", StaticFiles(directory=str(project_root)), name="static")
 
 # Serve main pages
 @app.get("/")
 async def serve_index():
     return FileResponse(str(project_root / "index.html"))
 
+@app.get("/styles.css")
+async def serve_styles():
+    return FileResponse(str(project_root / "styles.css"))
+
+@app.get("/script.js")
+async def serve_script():
+    return FileResponse(str(project_root / "script.js"))
+
+# Tool-specific routes
 @app.get("/tools/alt-text-generator/")
 async def serve_alt_text_tool():
-    return FileResponse(str(project_root / "tools" / "alt-text-generator" / "index.html"))
+    file_path = project_root / "tools" / "alt-text-generator" / "index.html"
+    return FileResponse(str(file_path))
 
-@app.get("/tools/llms-converter/")
-async def serve_llms_tool():
-    return FileResponse(str(project_root / "tools" / "llms-converter" / "index.html"))
-
-# Catch-all for other static files
-@app.get("/{full_path:path}")
-async def serve_static_files(full_path: str):
-    file_path = project_root / full_path
+@app.get("/tools/alt-text-generator/{filename}")
+async def serve_alt_text_files(filename: str):
+    file_path = project_root / "tools" / "alt-text-generator" / filename
     if file_path.exists() and file_path.is_file():
         return FileResponse(str(file_path))
     return {"error": "File not found"}, 404
 
+@app.get("/tools/llms-converter/")
+async def serve_llms_tool():
+    file_path = project_root / "tools" / "llms-converter" / "index.html"
+    return FileResponse(str(file_path))
+
+@app.get("/tools/llms-converter/{filename}")
+async def serve_llms_files(filename: str):
+    file_path = project_root / "tools" / "llms-converter" / filename
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(str(file_path))
+    return {"error": "File not found"}, 404
+
+# Blog routes
+@app.get("/blog/")
+async def serve_blog_index():
+    return FileResponse(str(project_root / "blog" / "index.html"))
+
+@app.get("/blog/{path:path}")
+async def serve_blog_files(path: str):
+    file_path = project_root / "blog" / path
+    # Handle directory requests by serving index.html
+    if file_path.is_dir():
+        index_path = file_path / "index.html"
+        if index_path.exists():
+            return FileResponse(str(index_path))
+    elif file_path.exists() and file_path.is_file():
+        return FileResponse(str(file_path))
+    return {"error": "File not found"}, 404
+
+# Mount static files for any remaining assets
+app.mount("/", StaticFiles(directory=str(project_root), html=True), name="static")
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"🚀 Starting JunkDrawer.Tools on port {port}")
+    
+    if LLMS_AVAILABLE:
+        print("✅ LLMS converter API available at /api")
+        print(f"📚 API documentation at http://localhost:{port}/api/docs")
     
     uvicorn.run(
         app, 

@@ -1,5 +1,5 @@
 // Frontend JavaScript for LLMS.txt Converter
-// Real API implementation connecting to FastAPI backend
+// Updated with better error handling and API communication
 
 class LLMSConverter {
     constructor() {
@@ -12,13 +12,29 @@ class LLMSConverter {
         this.currentJobId = null;
         this.progressInterval = null;
         
-        // API base URL - adjust for production
-        this.apiBase = (window.location.port === '8002' || window.location.port === '8080')
-            ? 'http://localhost:8001' 
-            : window.location.origin + '/api';
+        // Improved API base URL detection
+        this.apiBase = this.determineAPIBase();
         
         this.initializeEventListeners();
         this.updateAPIKeyVisibility();
+    }
+    
+    determineAPIBase() {
+        // Better API base URL detection
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        
+        // Development environment
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            if (port === '8002' || port === '8080') {
+                return 'http://localhost:8001';
+            }
+            // Railway or production with API mounted at /api
+            return window.location.origin + '/api';
+        }
+        
+        // Production environment
+        return window.location.origin + '/api';
     }
     
     initializeEventListeners() {
@@ -42,12 +58,26 @@ class LLMSConverter {
         document.getElementById('websiteUrl').addEventListener('input', (e) => {
             this.validateURL(e.target.value);
         });
+        
+        // Add Enter key support for URL field
+        document.getElementById('websiteUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && this.validateURL(e.target.value)) {
+                e.preventDefault();
+                this.handleConvert(false);
+            }
+        });
     }
     
     updateAPIKeyVisibility() {
         const useAI = document.getElementById('useAI').checked;
         const apiKeyGroup = document.getElementById('apiKeyGroup');
-        apiKeyGroup.style.display = useAI ? 'block' : 'none';
+        
+        if (useAI) {
+            apiKeyGroup.style.display = 'block';
+            apiKeyGroup.style.animation = 'slideIn 0.3s ease-out';
+        } else {
+            apiKeyGroup.style.display = 'none';
+        }
     }
     
     validateURL(url) {
@@ -96,6 +126,9 @@ class LLMSConverter {
             return;
         }
         
+        // Show button loading state
+        this.setButtonLoading(true);
+        
         // Show progress
         this.showProgress();
         this.hideResults();
@@ -104,8 +137,22 @@ class LLMSConverter {
         try {
             await this.processWithAPI(formData);
         } catch (error) {
+            console.error('Processing error:', error);
             this.showError(error.message);
             this.hideProgress();
+            this.setButtonLoading(false);
+        }
+    }
+    
+    setButtonLoading(loading) {
+        if (loading) {
+            this.convertBtn.classList.add('loading');
+            this.convertBtn.disabled = true;
+            this.previewBtn.disabled = true;
+        } else {
+            this.convertBtn.classList.remove('loading');
+            this.convertBtn.disabled = false;
+            this.previewBtn.disabled = false;
         }
     }
     
@@ -135,7 +182,8 @@ class LLMSConverter {
         }
         
         if (formData.use_ai && !formData.api_key) {
-            this.showError('OpenAI API key is required for AI enhancement');
+            this.showError('OpenAI API key is required for AI enhancement. Uncheck "Enhance with AI" to proceed without it.');
+            document.getElementById('apiKey').focus();
             return false;
         }
         
@@ -145,7 +193,7 @@ class LLMSConverter {
     async processWithAPI(formData) {
         try {
             // Start the processing job
-            this.updateProgress(0, 'Starting website processing...');
+            this.updateProgress(0, 'Starting website processing...', 'crawling');
             
             const response = await fetch(`${this.apiBase}/process-website`, {
                 method: 'POST',
@@ -156,8 +204,8 @@ class LLMSConverter {
             });
             
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to start processing');
+                const errorData = await response.json().catch(() => ({ detail: 'Server error' }));
+                throw new Error(errorData.detail || `Server error: ${response.status}`);
             }
             
             const startData = await response.json();
@@ -168,7 +216,15 @@ class LLMSConverter {
             
         } catch (error) {
             console.error('API Error:', error);
-            throw new Error(`Processing failed: ${error.message}`);
+            
+            // Provide helpful error messages
+            if (error.message.includes('Failed to fetch')) {
+                throw new Error('Cannot connect to the conversion service. Please try again later.');
+            } else if (error.message.includes('404')) {
+                throw new Error('Conversion service not found. Please contact support.');
+            } else {
+                throw error;
+            }
         }
     }
     
@@ -177,7 +233,20 @@ class LLMSConverter {
             clearInterval(this.progressInterval);
         }
         
+        let pollCount = 0;
+        const maxPolls = 300; // 5 minutes maximum
+        
         this.progressInterval = setInterval(async () => {
+            pollCount++;
+            
+            if (pollCount > maxPolls) {
+                clearInterval(this.progressInterval);
+                this.showError('Processing timeout. The website might be too large or the service is busy.');
+                this.hideProgress();
+                this.setButtonLoading(false);
+                return;
+            }
+            
             try {
                 const response = await fetch(`${this.apiBase}/job-status/${this.currentJobId}`);
                 
@@ -188,13 +257,20 @@ class LLMSConverter {
                 const status = await response.json();
                 
                 // Update progress with enhanced information
-                this.updateProgress(status.progress, status.message, status.phase, status.current_page, status.total_pages);
+                this.updateProgress(
+                    status.progress || 0, 
+                    status.message || 'Processing...', 
+                    status.phase, 
+                    status.current_page, 
+                    status.total_pages
+                );
                 
                 // Check if job is complete
                 if (status.status === 'completed') {
                     clearInterval(this.progressInterval);
                     this.showResults(status.result, status.filename);
                     this.hideProgress();
+                    this.setButtonLoading(false);
                 } else if (status.status === 'error') {
                     clearInterval(this.progressInterval);
                     throw new Error(status.error || 'Processing failed');
@@ -204,6 +280,7 @@ class LLMSConverter {
                 clearInterval(this.progressInterval);
                 this.showError(error.message);
                 this.hideProgress();
+                this.setButtonLoading(false);
             }
         }, 1000); // Poll every second
     }
@@ -211,29 +288,44 @@ class LLMSConverter {
     showResults(results, filename) {
         const resultsSection = document.getElementById('resultsSection');
         
-        // Update title
-        resultsSection.querySelector('h2').textContent = '✅ Conversion Complete!';
+        // Animate results appearance
+        resultsSection.style.opacity = '0';
+        resultsSection.style.display = 'block';
+        setTimeout(() => {
+            resultsSection.style.opacity = '1';
+        }, 50);
         
-        // Show stats
+        // Update title with animation
+        const title = resultsSection.querySelector('h2');
+        title.textContent = '✅ Conversion Complete!';
+        title.style.animation = 'fadeInDown 0.6s ease-out';
+        
+        // Show stats with staggered animation
         const statsGrid = document.getElementById('statsGrid');
         statsGrid.innerHTML = `
-            <div class="stat-card">
+            <div class="stat-card" style="animation-delay: 0.1s">
                 <div class="stat-number">${results.stats.total_rows || 0}</div>
                 <div class="stat-label">Total URLs</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="animation-delay: 0.2s">
                 <div class="stat-number">${results.stats.unique_pages || 0}</div>
                 <div class="stat-label">Processed Pages</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="animation-delay: 0.3s">
                 <div class="stat-number">${Object.keys(results.categories || {}).length}</div>
                 <div class="stat-label">Categories</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">${results.stats.ai_enhanced ? 'Yes' : 'No'}</div>
+            <div class="stat-card" style="animation-delay: 0.4s">
+                <div class="stat-number">${results.stats.ai_enhanced ? '✓' : '✗'}</div>
                 <div class="stat-label">AI Enhanced</div>
             </div>
         `;
+        
+        // Apply animations to stat cards
+        const statCards = statsGrid.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.animation = `slideIn 0.5s ease-out ${index * 0.1}s both`;
+        });
         
         // Show download buttons
         const downloadButtons = document.getElementById('downloadButtons');
@@ -246,19 +338,27 @@ class LLMSConverter {
             </button>
         `;
         
-        // Show preview content
-        document.getElementById('previewContent').textContent = results.preview || '';
+        // Show preview content with syntax highlighting (basic)
+        const previewContent = results.preview || '';
+        const previewElement = document.getElementById('previewContent');
+        previewElement.textContent = previewContent;
         
         // Store results for download
         this.lastResults = results;
         this.lastFilename = filename;
         
-        this.showResultsSection();
+        // Show category breakdown if available
+        if (results.categories) {
+            const categoryList = Object.entries(results.categories)
+                .map(([cat, count]) => `${cat}: ${count} pages`)
+                .join(', ');
+            console.log('Categories:', categoryList);
+        }
     }
     
     async downloadFile(fileType) {
         if (!this.currentJobId) {
-            this.showError('No job ID available for download');
+            this.showError('No conversion results available for download');
             return;
         }
         
@@ -266,7 +366,7 @@ class LLMSConverter {
             const response = await fetch(`${this.apiBase}/download/${this.currentJobId}/${fileType}`);
             
             if (!response.ok) {
-                throw new Error('Download failed');
+                throw new Error('Download failed. Please try again.');
             }
             
             // Get the filename from Content-Disposition header or use default
@@ -291,6 +391,9 @@ class LLMSConverter {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
+            // Show success feedback
+            this.showSuccess(`${filename} downloaded successfully!`);
+            
         } catch (error) {
             this.showError(`Download failed: ${error.message}`);
         }
@@ -298,14 +401,11 @@ class LLMSConverter {
     
     showProgress() {
         this.progressSection.style.display = 'block';
-        this.convertBtn.disabled = true;
-        this.previewBtn.disabled = true;
+        this.progressSection.style.animation = 'slideIn 0.5s ease-out';
     }
     
     hideProgress() {
         this.progressSection.style.display = 'none';
-        this.convertBtn.disabled = false;
-        this.previewBtn.disabled = false;
         
         if (this.progressInterval) {
             clearInterval(this.progressInterval);
@@ -314,8 +414,11 @@ class LLMSConverter {
     }
     
     updateProgress(percentage, text, phase = null, currentPage = null, totalPages = null) {
-        // Update progress bar
-        document.getElementById('progressFill').style.width = percentage + '%';
+        // Update progress bar with smooth animation
+        const progressFill = document.getElementById('progressFill');
+        progressFill.style.width = percentage + '%';
+        
+        // Update progress text
         document.getElementById('progressText').textContent = text;
         
         // Update page counter
@@ -333,9 +436,12 @@ class LLMSConverter {
                 estimatedSeconds = totalPages * 3;
             }
             
-            const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
+            const remainingPages = totalPages - currentPage;
+            const remainingSeconds = Math.ceil((remainingPages / totalPages) * estimatedSeconds);
+            
+            const estimatedMinutes = Math.ceil(remainingSeconds / 60);
             document.getElementById('estimatedTime').textContent = 
-                estimatedMinutes > 1 ? `~${estimatedMinutes} min` : '< 1 min';
+                remainingSeconds < 60 ? '< 1 min' : `~${estimatedMinutes} min remaining`;
         }
         
         // Update phase indicators
@@ -369,17 +475,38 @@ class LLMSConverter {
         });
     }
     
-    showResultsSection() {
-        this.resultsSection.style.display = 'block';
-    }
-    
     hideResults() {
         this.resultsSection.style.display = 'none';
     }
     
     showError(message) {
         this.errorMessage.textContent = message;
-        this.errorMessage.style.display = 'block';
+        this.errorMessage.style.display = 'flex';
+        this.errorMessage.style.animation = 'slideIn 0.3s ease-out';
+        
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            this.hideError();
+        }, 10000);
+    }
+    
+    showSuccess(message) {
+        // Temporarily show success message in place of error
+        const errorElement = this.errorMessage;
+        const originalClass = errorElement.className;
+        
+        errorElement.className = 'success-message';
+        errorElement.textContent = '✅ ' + message;
+        errorElement.style.display = 'flex';
+        errorElement.style.background = '#d4edda';
+        errorElement.style.color = '#155724';
+        errorElement.style.borderColor = '#c3e6cb';
+        
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+            errorElement.className = originalClass;
+            errorElement.style = '';
+        }, 3000);
     }
     
     hideError() {
@@ -393,15 +520,21 @@ function resetTool() {
     document.getElementById('llmsForm').reset();
     document.getElementById('maxPages').value = 100;
     document.getElementById('filename').value = 'LLMS';
+    document.getElementById('useAI').checked = true;
     
-    // Hide sections
-    document.getElementById('progressSection').style.display = 'none';
-    document.getElementById('resultsSection').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'none';
+    // Hide sections with animation
+    const sections = ['progressSection', 'resultsSection', 'errorMessage'];
+    sections.forEach(id => {
+        const element = document.getElementById(id);
+        element.style.opacity = '0';
+        setTimeout(() => {
+            element.style.display = 'none';
+            element.style.opacity = '1';
+        }, 300);
+    });
     
     // Reset button states
-    document.getElementById('convertBtn').disabled = false;
-    document.getElementById('previewBtn').disabled = false;
+    window.llmsConverter.setButtonLoading(false);
     
     // Clear any ongoing polling
     if (window.llmsConverter.progressInterval) {
@@ -414,9 +547,18 @@ function resetTool() {
     
     // Update API key visibility
     window.llmsConverter.updateAPIKeyVisibility();
+    
+    // Focus on URL input
+    document.getElementById('websiteUrl').focus();
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.llmsConverter = new LLMSConverter();
+    
+    // Add smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Focus on URL input on load
+    document.getElementById('websiteUrl').focus();
 });
