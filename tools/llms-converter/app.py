@@ -24,7 +24,13 @@ from backend.url_processor import URLProcessor
 from backend.categorizer import Categorizer
 from backend.llms_generator import LLMSGenerator
 
-app = FastAPI(title="LLMS.txt Converter API", version="1.0.0")
+# Create the app with a custom root path for production
+app = FastAPI(
+    title="LLMS.txt Converter API", 
+    version="1.0.0",
+    # This allows the app to work when mounted under a prefix
+    root_path=os.getenv("API_ROOT_PATH", "")
+)
 
 # Enable CORS for frontend
 app.add_middleware(
@@ -57,7 +63,7 @@ class JobStatus(BaseModel):
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"message": "LLMS.txt Converter API is running"}
+    return {"message": "LLMS.txt Converter API is running", "root_path": app.root_path}
 
 @app.post("/process-website")
 async def process_website(request: ProcessRequest, background_tasks: BackgroundTasks):
@@ -229,7 +235,7 @@ async def process_website_background(
 @app.on_event("startup")
 async def startup_event():
     """Startup tasks"""
-    print("LLMS.txt Converter API starting up...")
+    print(f"LLMS.txt Converter API starting up... (root_path: {app.root_path})")
 
 @app.on_event("shutdown")
 async def shutdown_event():

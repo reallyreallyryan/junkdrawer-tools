@@ -19,6 +19,8 @@ import uvicorn
 
 # Import the LLMS converter app
 try:
+    # Set the API root path environment variable before importing
+    os.environ["API_ROOT_PATH"] = "/api"
     from app import app as llms_app
     LLMS_AVAILABLE = True
 except ImportError:
@@ -30,7 +32,7 @@ app = FastAPI(title="JunkDrawer.Tools", version="1.0.0")
 
 # Mount the LLMS converter API if available
 if LLMS_AVAILABLE:
-    app.mount("/api", llms_app)
+    app.mount("/api", llms_app, name="llms_api")
     print("✅ LLMS converter API mounted at /api")
 
 # Serve static files for the root directory
