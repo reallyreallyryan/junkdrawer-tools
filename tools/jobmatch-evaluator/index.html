@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobMatch Evaluator - JunkDrawer.Tools</title>
+    <meta name="description" content="Instantly evaluate how well your resume matches a job description. Get AI-powered compatibility scores and personalized cover letter starters.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .tool-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .file-upload-btn {
+            display: inline-block;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #f1c40f;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--charcoal-gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #495057;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .match-score {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1rem;
+            position: relative;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--charcoal-gray);
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .match-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .detail-section h3 {
+            margin: 0 0 1rem 0;
+            color: var(--charcoal-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .keyword {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            border: 1px solid #bae6fd;
+        }
+
+        .keyword.missing {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        .cover-letter-section {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .cover-letter-section h3 {
+            margin: 0 0 1rem 0;
+            color: var(--charcoal-gray);
+        }
+
+        .cover-letter-text {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+
+        .score-breakdown {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .score-breakdown h3 {
+            margin: 0 0 1rem 0;
+            color: var(--charcoal-gray);
+            font-size: 1.1rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .breakdown-label {
+            font-weight: 500;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .breakdown-score {
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .breakdown-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 0 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breakdown-fill {
+            height: 100%;
+            background: var(--primary-yellow);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .processing-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid var(--primary-yellow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #feb2b2;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--charcoal-gray);
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .match-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1>JobMatch Evaluator</h1>
+            <p>Instantly evaluate how well your resume matches a job description. Get AI-powered compatibility scores and personalized cover letter starters.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>🎯 How it works</h3>
+            <ul>
+                <li>Paste or upload your resume (PDF/DOCX/TXT supported)</li>
+                <li>Paste the job description from LinkedIn or any job board</li>
+                <li>Get an instant AI-powered match score and analysis</li>
+                <li>Receive a personalized cover letter starter</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <div class="form-group">
+                <label for="apiKey">OpenAI API Key (required)</label>
+                <input type="password" id="apiKey" name="apiKey" 
+                       placeholder="sk-..." required>
+                <small style="color: #666; font-size: 0.875rem;">
+                    Your API key is only used for this session and never stored.
+                    <a href="/blog/how-to-get-openai-api-key/" target="_blank">Need an API key?</a>
+                </small>
+            </div>
+
+            <div class="two-column">
+                <div class="form-group">
+                    <label>📄 Your Resume</label>
+                    <label for="resumeFile" class="file-upload-btn">
+                        📎 Upload Resume (PDF/DOCX/TXT)
+                    </label>
+                    <input type="file" id="resumeFile" class="file-input" 
+                           accept=".pdf,.docx,.doc,.txt">
+                    <div class="file-info" id="resumeFileInfo"></div>
+                    <textarea id="resumeText" placeholder="Or paste your resume text here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="jobDescription">📋 Job Description</label>
+                    <textarea id="jobDescription" placeholder="Paste the job description here (e.g., from LinkedIn)..."></textarea>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="button" class="btn" id="evaluateBtn" disabled>
+                    🎯 Evaluate Match
+                </button>
+                <button type="button" class="btn btn-secondary" id="clearBtn" style="margin-left: 1rem;">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="processing-section" id="processingSection">
+            <div class="spinner"></div>
+            <p>Analyzing your resume against the job description...</p>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="match-score">
+                <h2 class="score-label">Match Score</h2>
+                <div class="score-circle">
+                    <span class="score-value" id="scoreValue">0%</span>
+                </div>
+                <p id="scoreDescription"></p>
+            </div>
+
+            <div class="score-breakdown" id="scoreBreakdown">
+                <h3>Score Breakdown</h3>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">📊 Semantic Similarity</span>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" id="semanticBar" style="width: 0%"></div>
+                    </div>
+                    <span class="breakdown-score" id="semanticScore">0/25</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">💻 Technical Skills</span>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" id="hardSkillsBar" style="width: 0%"></div>
+                    </div>
+                    <span class="breakdown-score" id="hardSkillsScore">0/35</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">🤝 Soft Skills</span>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" id="softSkillsBar" style="width: 0%"></div>
+                    </div>
+                    <span class="breakdown-score" id="softSkillsScore">0/15</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">🎯 Role Relevance</span>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" id="roleBar" style="width: 0%"></div>
+                    </div>
+                    <span class="breakdown-score" id="roleScore">0/25</span>
+                </div>
+            </div>
+
+            <div class="match-details">
+                <div class="detail-section">
+                    <h3>✅ Matched Skills & Keywords</h3>
+                    <div class="keyword-list" id="matchedKeywords"></div>
+                </div>
+                <div class="detail-section">
+                    <h3>⚠️ Missing Skills & Keywords</h3>
+                    <div class="keyword-list" id="missingKeywords"></div>
+                </div>
+            </div>
+
+            <div class="cover-letter-section" id="coverLetterSection">
+                <h3>✍️ Cover Letter Starter</h3>
+                <div class="cover-letter-text" id="coverLetterText"></div>
+                <button type="button" class="copy-btn" id="copyCoverLetterBtn">
+                    📋 Copy to Clipboard
+                </button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools - Built with caffeine and questionable decisions</p>
+        </div>
+    </footer>
+
+    <!-- PDF.js for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set worker path for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <!-- Mammoth.js for DOCX parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
