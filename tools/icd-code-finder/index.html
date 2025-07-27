@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICD-10 Code Finder - JunkDrawer.Tools</title>
+    <meta name="description" content="Fast, natural language ICD-10 code lookup. Search by condition, symptom, or injury. AI-enhanced matching with keyword fallback.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-header h1 {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            color: var(--charcoal-gray);
+        }
+
+        .tool-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: #0c4a6e;
+        }
+
+        .info-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #0c4a6e;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--charcoal-gray);
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .help-text {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .api-section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .api-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .api-toggle input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        .api-key-group {
+            display: none;
+        }
+
+        .api-key-group.show {
+            display: block;
+        }
+
+        .never-stored {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+        }
+
+        .btn-primary:hover {
+            background: #e6c200;
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .result-code {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--charcoal-gray);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-description {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-yellow);
+            color: var(--charcoal-gray);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #e6c200;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+            color: white;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--primary-yellow);
+        }
+
+        .easter-egg {
+            display: none;
+            background: #fffbeb;
+            border: 2px solid var(--primary-yellow);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .ai-enhanced-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .tool-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">JunkDrawer.Tools</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/#tools">Tools</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>🩺 ICD-10 Code Finder</h1>
+                <p>Natural language search for ICD-10 medical codes. Fast keyword matching with optional AI enhancement for complex medical queries.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>How it works:</h3>
+                <ul>
+                    <li><strong>Keyword Search:</strong> Fast, free search through 93,000+ ICD-10 codes using natural language</li>
+                    <li><strong>AI Enhancement (Optional):</strong> Add your OpenAI API key for improved matching of complex medical terminology</li>
+                    <li><strong>Examples:</strong> "back pain", "broken arm", "diabetes type 2", "anxiety", "struck by duck" 🦆</li>
+                </ul>
+            </div>
+
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="searchInput">Search for ICD-10 Codes</label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Type a condition, symptom, or injury..."
+                        autocomplete="off"
+                    >
+                    <div class="help-text">
+                        Search by condition, symptom, injury, or ICD code. Results update as you type.
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-toggle">
+                        <input type="checkbox" id="useAI" />
+                        <label for="useAI">Enable AI Enhancement (Optional)</label>
+                    </div>
+                    
+                    <div class="api-key-group" id="apiKeyGroup">
+                        <div class="form-group">
+                            <label for="apiKey">OpenAI API Key</label>
+                            <input 
+                                type="password" 
+                                id="apiKey" 
+                                placeholder="sk-..." 
+                                autocomplete="off"
+                            >
+                            <div class="help-text">
+                                <span class="never-stored">Never stored. Used only for this session.</span>
+                                Need an API key? <a href="/blog/how-to-get-openai-api-key/" target="_blank">Get one here</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="easter-egg" id="duckAlert">
+                🦆 Duck-related injuries detected! You've found our favorite code: W61.62XA - Struck by duck, initial encounter
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div id="results">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 JunkDrawer.Tools</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
