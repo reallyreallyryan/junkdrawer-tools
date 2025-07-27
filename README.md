@@ -16,17 +16,7 @@ Generate SEO-friendly alt text for images using AI. Upload multiple images and g
 
 **Requirements:** OpenAI API key (~$0.02-0.05 per image)
 
-### 🧠 LLMS.txt Converter (`/tools/llms-converter/`)
-Convert any website into an AI-optimized LLMS.txt file. Perfect for AI search engines, chatbots, and language model training.
-
-**Features:**
-- Website crawling and content extraction
-- AI-powered content categorization
-- Multiple export formats (LLMS.txt, CSV, JSON)
-- SEO-optimized descriptions
-- Customizable crawling settings
-
-**Requirements:** OpenAI API key (optional, for AI enhancement)
+#
 
 ## API Integration
 

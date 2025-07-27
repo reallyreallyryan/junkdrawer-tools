@@ -1,12 +1,17 @@
 # JunkDrawer.Tools
 
-> Your digital tool chest - free, API-powered utilities that just work. Bring your own API keys for privacy-first tools.
+> A digital tool chest - free, API-powered utilities that just work. Bring your own API keys for privacy-first tools.
 
 ## Tools
 
 - [Alt Text Generator](https://junkdrawer.tools/tools/alt-text-generator/): Generate SEO-friendly alt text for images using AI. Upload multiple images and get AI-powered descriptions for better accessibility and SEO. Uses OpenAI GPT-4 for accurate, contextual descriptions.
 
 - [Title Tag Length Tester](https://junkdrawer.tools/tools/title-tag-counter/): Test your page titles to ensure they don't get cut off in Google search results. Real-time pixel width testing for both desktop (600px) and mobile (350px) views.
+
+- [Job Post & Resume Evaluator](https://junkdrawer.tools/tools/jobmatch-evaluator/): Instantly evaluate how well your resume matches a job description. Get AI-powered compatibility scores and personalized cover letter starters.
+
+- [IDC-10 Code Finder](https://junkdrawer.tools/tools/icd-code-finder/): Search for ICD-10 medical codes quickly, with optional AI results.
+
 
 ## Resources
 
@@ -22,7 +27,7 @@
 
 ## About
 
-JunkDrawer.Tools is a collection of genuinely useful utilities that don't require signups, subscriptions, or surrendering your data. Just bring your own API keys and get to work. No corporate fluff, no dark patterns, just tools that respect your time and privacy.
+JunkDrawer.Tools is a collection of utilities that don't require signups or surrendering your data. Just bring your own API keys and get to work. No corporate fluff just tools that respect your time and privacy.
 
 ## Features
 
@@ -38,12 +43,5 @@ JunkDrawer.Tools is a collection of genuinely useful utilities that don't requir
 - **Content Creators**: Ensure titles display properly in search results
 - **Web Developers**: Quick utilities for common tasks
 - **Digital Marketers**: Tools for better search visibility
+- **Medical Professionals**: Quick research on common insurance icd codes
 - **Accessibility Advocates**: Generate descriptive alt text for screen readers
-
-## Technical Details
-
-- Built with vanilla JavaScript, no heavy frameworks
-- Static site hosted on Railway
-- Frontend-only architecture for maximum privacy
-- Responsive design works on all devices
-- Direct integration with OpenAI API for AI features
