@@ -266,19 +266,39 @@ Focus on clinical accuracy and specificity. Consider:
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content.trim();
+    let aiResponse = data.choices[0].message.content.trim();
     
     try {
+        // Remove markdown code blocks if present
+        if (aiResponse.startsWith('```json')) {
+            aiResponse = aiResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        } else if (aiResponse.startsWith('```')) {
+            aiResponse = aiResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+        }
+        
         const aiResults = JSON.parse(aiResponse);
-        return aiResults.map(result => ({
-            code: result.code,
-            description: result.description,
-            aiEnhanced: true,
-            relevanceScore: result.relevance_score || 1.0
-        }));
+        
+        // Validate the response structure
+        if (!Array.isArray(aiResults)) {
+            throw new Error('AI response is not an array');
+        }
+        
+        return aiResults.map(result => {
+            if (!result.code || !result.description) {
+                console.warn('Invalid result structure:', result);
+                return null;
+            }
+            return {
+                code: result.code,
+                description: result.description,
+                aiEnhanced: true,
+                relevanceScore: result.relevance_score || 1.0
+            };
+        }).filter(result => result !== null);
     } catch (parseError) {
         console.error('Failed to parse AI response:', aiResponse);
-        throw new Error('Invalid AI response format');
+        console.error('Parse error:', parseError);
+        throw new Error(`Invalid AI response format: ${parseError.message}`);
     }
 }
 
